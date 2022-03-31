@@ -12,9 +12,15 @@ import java.util.Date;
  * @author DAW
  */
 public class MiniFileManager {
-
+    /**
+     * File con el directorio donde vamos a trabajar
+     */
     private File file = new File("C:/Users/DAW/Documents/NetBeansProjects/miniTerminal");
-
+    
+    
+    /**
+     * Imprime toda la informacion de los comandos
+     */
     public void help() {
         System.out.println(" pwd: Muestra cual es la carpeta actual.\n"
                 + "cd: Cambia la carpeta actual a ‘DIR’. Con .. cambia a la carpeta superior.\n"
@@ -27,21 +33,37 @@ public class MiniFileManager {
                 + "mv <FILE1> <FILE2>: Mueve o renombra ‘FILE1’ a ‘FILE2’.\n"
                 + "exit: Termina el programa.");
     }
-
+    /**
+     * Da la ruta del directorio donde estas ubicado
+     * @return String con la ruta del directorio donde estas ubicado
+     */
     public String getPWD() {
         return file.getAbsolutePath();
     }
-
+    /**
+     * 
+     * @param part2
+     * @return 
+     */
     public boolean changeDir(String part2) {
-        
-        File fileNuevo = new File(creaRuta(part2));
-        if (fileNuevo.exists() && fileNuevo.isDirectory()) {
-            file = fileNuevo;
-            return true;
+       String ruta;
+        if (part2.equals("..")) {
+              ruta=file.getParentFile().getAbsolutePath();
+        } else {
+             ruta=creaRuta(part2);
         }
+           File fileNuevo = new File(ruta);
+            if (fileNuevo.exists() && fileNuevo.isDirectory()) {
+                file = fileNuevo;
+                return true;
+            }
+        
         return false;
     }
-
+    /**
+     * 
+     * @param info 
+     */
     public void printList(boolean info) {
         if (info) {
             String[] lista = file.list();
@@ -56,9 +78,12 @@ public class MiniFileManager {
             }
         }
     }
-
+    /**
+     * 
+     * @param part2 
+     */
     public void mkdir(String part2) {
-       
+
         File fileCreado = new File(creaRuta(part2));
         if (fileCreado.exists()) {
             System.out.println("Ya existe");
@@ -68,33 +93,45 @@ public class MiniFileManager {
         }
 
     }
-
+    /**
+     * 
+     * @param part2 
+     */
     public void rm(String part2) {
-         File fileBorrar = new File(creaRuta(part2));
-        if(fileBorrar.delete()){
+        File fileBorrar = new File(creaRuta(part2));
+        if (fileBorrar.delete()) {
             System.out.println("borrado");
-        }else{
+        } else {
             System.out.println("ERROR");
         }
-        
+
+    }
+    /**
+     * 
+     * @param antes
+     * @param despues 
+     */
+    public void mv(String antes, String despues) {
+        File antiguo = new File(creaRuta(antes));
+        File nuevo = new File(creaRuta(despues));
+        if (antiguo.exists()) {
+            boolean cambioF = antiguo.renameTo(nuevo);
+            System.out.println(cambioF);
+        }
+    }
+    /**
+     * 
+     * @param part2
+     * @return 
+     */
+    public String creaRuta(String part2) {
+        String ruta;
+        if (part2.contains("/")) {
+            ruta = part2;
+        } else {
+            ruta = (file.getAbsolutePath() + "/" + part2);
+        }
+        return ruta;
     }
 
-    public void mv(String antes, String despues) {
-          File antiguo = new File(creaRuta(antes));
-          File nuevo = new File(creaRuta(despues));
-          if(antiguo.exists()){
-         boolean cambioF = antiguo.renameTo(nuevo);
-         System.out.println(cambioF);
-          }
-    }
-    public String creaRuta(String part2){
-        String ruta;
-         if(part2.contains("/")){
-        ruta= part2;
-        }else{
-             ruta=(file.getAbsolutePath()+"/"+ part2);
-         }
-        return ruta; 
-    }
-    
 }
