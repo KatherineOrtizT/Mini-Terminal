@@ -9,17 +9,17 @@ import java.util.Date;
 
 /**
  *
- * @author DAW
+ * @author Raquel Tapia Oriz
  */
 public class MiniFileManager {
+
     /**
      * File con el directorio donde vamos a trabajar
      */
-    private File file = new File("C:/Users/DAW/Documents/NetBeansProjects/miniTerminal");
-    
-    
+    private File file = new File("");
+
     /**
-     * Imprime toda la informacion de los comandos
+     * Imprime toda la informacion de los comandos disponibles
      */
     public void help() {
         System.out.println(" pwd: Muestra cual es la carpeta actual.\n"
@@ -33,6 +33,7 @@ public class MiniFileManager {
                 + "mv <FILE1> <FILE2>: Mueve o renombra ‘FILE1’ a ‘FILE2’.\n"
                 + "exit: Termina el programa.");
     }
+
     /**
      * Da la ruta del directorio donde estas ubicado
      * @return String con la ruta del directorio donde estas ubicado
@@ -40,31 +41,43 @@ public class MiniFileManager {
     public String getPWD() {
         return file.getAbsolutePath();
     }
+
     /**
-     * 
-     * @param part2
-     * @return 
+     * Sirve para cambiar la ruta de donde estamos trabajando al directorio
+     * superior con ".." o al directorio que le indiques con la ruta absoluta o
+     * relativa
+     *
+     * @param part2 El String que distingue a que ruta cambiamos
+     * @return true en el caso de cambiar la ruta y false en el caso de que no
+     * se haga ninguin cambio
      */
     public boolean changeDir(String part2) {
-       String ruta;
+        String ruta;
         if (part2.equals("..")) {
-              ruta=file.getParentFile().getAbsolutePath();
+            ruta = file.getParentFile().getAbsolutePath();
         } else {
-             ruta=creaRuta(part2);
+            ruta = creaRuta(part2);
         }
-           File fileNuevo = new File(ruta);
-            if (fileNuevo.exists() && fileNuevo.isDirectory()) {
-                file = fileNuevo;
-                return true;
-            }
-        
+        File fileNuevo = new File(ruta);
+        if (fileNuevo.exists() && fileNuevo.isDirectory()) {
+            file = fileNuevo;
+            return true;
+        }
+
         return false;
     }
+
     /**
-     * 
-     * @param info 
+     * Te indica la lista de directorios y ficheros de donde estas ubicado con
+     * un boolean dice si te imprime solo nombre o nombre, tamaño y fecha de la
+     * ultima modficacion
+     *
+     * @param info un true si va a imprimir toda la informacion Nombre, tamaño y
+     * fecha de la ultima modificacion False imprime solo el nombre
      */
     public void printList(boolean info) {
+        String ruta = file.getAbsolutePath();
+        file = new File(ruta);
         if (info) {
             String[] lista = file.list();
             for (int i = 0; i < lista.length; i++) {
@@ -78,9 +91,10 @@ public class MiniFileManager {
             }
         }
     }
+
     /**
-     * 
-     * @param part2 
+     * Crea el directorio ‘DIR’ en la carpeta actual.
+     * @param part2 El String el nombre del Directorio/Fichero que vamos a crear
      */
     public void mkdir(String part2) {
 
@@ -93,23 +107,48 @@ public class MiniFileManager {
         }
 
     }
+
     /**
-     * 
-     * @param part2 
+     * Borra ‘FILE’. Si es una carpeta, borrará primero sus archivos y luego la
+     * carpeta. Si tiene subcarpetas, las dejará intactas y mostrará un aviso al
+     * usuario.
+     *
+     * @param part2 El String el nombre del Directorio/Fichero que vamos a
+     * borrar
      */
     public void rm(String part2) {
         File fileBorrar = new File(creaRuta(part2));
-        if (fileBorrar.delete()) {
+        boolean comprueba = true;
+        if (fileBorrar.listFiles().length != 0) {
+            for (File i : fileBorrar.listFiles()) {//comprobamos que no tenga Subcarpetas
+                if (i.isDirectory()) {
+                    comprueba = false;
+                }
+            }
+            if (comprueba) {
+                File borrarArchivo[] = fileBorrar.listFiles();//borramos los ficheros
+                for (int i = 0; i < borrarArchivo.length; i++) {
+                    borrarArchivo[i].delete();
+                }
+                if (fileBorrar.delete()) {
+                    System.out.println("borrado");
+                }
+            }
+        } else if (fileBorrar.delete()) {
             System.out.println("borrado");
         } else {
             System.out.println("ERROR");
         }
 
     }
+
     /**
-     * 
-     * @param antes
-     * @param despues 
+     * Mueve o renombra ‘FILE1’ a ‘FILE2’
+     *
+     * @param antes El String del nombre del Directorio/Fichero que vamos a
+     * mover o renombrar
+     * @param despues El String con el nombre nuevo o ubicacion del
+     * Directorio/Fichero
      */
     public void mv(String antes, String despues) {
         File antiguo = new File(creaRuta(antes));
@@ -119,10 +158,13 @@ public class MiniFileManager {
             System.out.println(cambioF);
         }
     }
+
     /**
-     * 
-     * @param part2
-     * @return 
+     * Te permite distinguir si es una ruta absoluta o relativa en caso de que
+     * no sea absoluta la crea y la envia en forma de cadena de texto
+     *
+     * @param part2 El String que distingue la ruta
+     * @return Un String con la ruta absoluta
      */
     public String creaRuta(String part2) {
         String ruta;
@@ -132,6 +174,24 @@ public class MiniFileManager {
             ruta = (file.getAbsolutePath() + "/" + part2);
         }
         return ruta;
+    }
+    /**
+     * Calculamos el tamaño de toda la carpeta y sus subcarpetas
+     * @param directorio para calcular tamaño
+     * @return tamaño en Bytes de la carpeta
+     */
+    public long calcularTamaño(File directorio) {
+        long tamanio = 0;
+        if (directorio.isDirectory()) {
+            for (File i : directorio.listFiles()) {
+                if (i.isFile()) {
+                    tamanio += i.length();
+                } else {
+                    tamanio += calcularTamaño(i);
+                }
+            }
+        }
+        return tamanio;
     }
 
 }
