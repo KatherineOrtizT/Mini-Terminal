@@ -76,18 +76,33 @@ public class MiniFileManager {
      * fecha de la ultima modificacion False imprime solo el nombre
      */
     public void printList(boolean info) {
-        String ruta = file.getAbsolutePath();
+       String ruta = file.getAbsolutePath();
         file = new File(ruta);
         if (info) {
-            String[] lista = file.list();
+            File[] lista = file.listFiles();
             for (int i = 0; i < lista.length; i++) {
                 Date fecha = new Date(file.lastModified());
-                System.out.println(file.length() + " " + fecha + " " + lista[i]);
+                if(lista[i].isDirectory()){
+                System.out.println(file.length() + " " + fecha + " " + lista[i].getName());
+                }
+            }
+            for (int i = 0; i < lista.length; i++) {
+                Date fecha = new Date(file.lastModified());
+                if(lista[i].isFile()){
+                System.out.println(file.length() + " " + fecha + " " + lista[i].getName());
+                }
             }
         } else {
-            String[] lista = file.list();
+            File[] lista = file.listFiles();
             for (int i = 0; i < lista.length; i++) {
+                 if(lista[i].isDirectory()){
                 System.out.println(lista[i]);
+                 }
+            }
+            for (int i = 0; i < lista.length; i++) {
+                if(lista[i].isFile()){
+                System.out.println(lista[i]);
+                }
             }
         }
     }
