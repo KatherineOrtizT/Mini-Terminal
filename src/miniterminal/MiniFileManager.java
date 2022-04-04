@@ -36,6 +36,7 @@ public class MiniFileManager {
 
     /**
      * Da la ruta del directorio donde estas ubicado
+     *
      * @return String con la ruta del directorio donde estas ubicado
      */
     public String getPWD() {
@@ -76,32 +77,31 @@ public class MiniFileManager {
      * fecha de la ultima modificacion False imprime solo el nombre
      */
     public void printList(boolean info) {
-       String ruta = file.getAbsolutePath();
+        String ruta = file.getAbsolutePath();
         file = new File(ruta);
+        File[] lista = file.listFiles();
         if (info) {
-            File[] lista = file.listFiles();
-            for (int i = 0; i < lista.length; i++) {
-                Date fecha = new Date(file.lastModified());
-                if(lista[i].isDirectory()){
-                System.out.println(file.length() + " " + fecha + " " + lista[i].getName());
+            for (File i : lista) {
+                Date fecha = new Date(i.lastModified());
+                if (i.isDirectory()) {
+                    System.out.println(file.length() + " " + fecha + " " + i.getName());
                 }
             }
-            for (int i = 0; i < lista.length; i++) {
-                Date fecha = new Date(file.lastModified());
-                if(lista[i].isFile()){
-                System.out.println(file.length() + " " + fecha + " " + lista[i].getName());
+            for (File i : lista) {
+                Date fecha = new Date(i.lastModified());
+                if (i.isFile()) {
+                    System.out.println(file.length() + " " + fecha + " " + i.getName());
                 }
             }
         } else {
-            File[] lista = file.listFiles();
-            for (int i = 0; i < lista.length; i++) {
-                 if(lista[i].isDirectory()){
-                System.out.println(lista[i]);
-                 }
+            for (File i : lista) {
+                if (i.isDirectory()) {
+                    System.out.println(i.getName());
+                }
             }
-            for (int i = 0; i < lista.length; i++) {
-                if(lista[i].isFile()){
-                System.out.println(lista[i]);
+            for (File i : lista) {
+                if (i.isFile()) {
+                    System.out.println(i.getName());
                 }
             }
         }
@@ -109,6 +109,7 @@ public class MiniFileManager {
 
     /**
      * Crea el directorio ‘DIR’ en la carpeta actual.
+     *
      * @param part2 El String el nombre del Directorio/Fichero que vamos a crear
      */
     public void mkdir(String part2) {
@@ -133,17 +134,17 @@ public class MiniFileManager {
      */
     public void rm(String part2) {
         File fileBorrar = new File(creaRuta(part2));
-        boolean comprueba = true;
+        boolean tieneDirectorios = false;
         if (fileBorrar.listFiles().length != 0) {
             for (File i : fileBorrar.listFiles()) {//comprobamos que no tenga Subcarpetas
                 if (i.isDirectory()) {
-                    comprueba = false;
+                    tieneDirectorios = true;
                 }
             }
-            if (comprueba) {
+            if (!tieneDirectorios) {
                 File borrarArchivo[] = fileBorrar.listFiles();//borramos los ficheros
-                for (int i = 0; i < borrarArchivo.length; i++) {
-                    borrarArchivo[i].delete();
+                for (File i : borrarArchivo) {
+                    i.delete();
                 }
                 if (fileBorrar.delete()) {
                     System.out.println("borrado");
@@ -183,30 +184,13 @@ public class MiniFileManager {
      */
     public String creaRuta(String part2) {
         String ruta;
-        if (part2.contains("/")) {
+        File file2 = new File(file.getAbsolutePath(), part2);
+        if (part2.contains("/") && !file2.exists()) {
             ruta = part2;
         } else {
             ruta = (file.getAbsolutePath() + "/" + part2);
         }
         return ruta;
-    }
-    /**
-     * Calculamos el tamaño de toda la carpeta y sus subcarpetas
-     * @param directorio para calcular tamaño
-     * @return tamaño en Bytes de la carpeta
-     */
-    public long calcularTamaño(File directorio) {
-        long tamanio = 0;
-        if (directorio.isDirectory()) {
-            for (File i : directorio.listFiles()) {
-                if (i.isFile()) {
-                    tamanio += i.length();
-                } else {
-                    tamanio += calcularTamaño(i);
-                }
-            }
-        }
-        return tamanio;
     }
 
 }
